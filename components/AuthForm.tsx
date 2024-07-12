@@ -4,8 +4,38 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { Button } from "./ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
+import CustomInput from "./CustomInput";
+import { authFormSchema } from "@/lib/utils";
+
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState(null);
+
+  const form = useForm<z.infer<typeof authFormSchema>>({
+    resolver: zodResolver(authFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof authFormSchema>) {
+    console.log(values);
+  }
 
   return (
     <section className="auth-form">
@@ -35,7 +65,25 @@ const AuthForm = ({ type }: { type: string }) => {
       {user ? (
         <div className="flex flex-col gap-4">{/* PlaidLink */}</div>
       ) : (
-        <>FORM</>
+        <>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <CustomInput
+                control={form.control}
+                name="username"
+                label="username"
+                placeholder="Enter your username"
+              />
+              <CustomInput
+                control={form.control}
+                name="password"
+                label="password"
+                placeholder="Enter your password"
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        </>
       )}
     </section>
   );
